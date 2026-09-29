@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Password Security Analyzer</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a, #172554, #1e3a8a);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    color: white;
+}
+
+.container {
+    width: 850px;
+    max-width: 100%;
+    background: rgba(15, 23, 42, 0.96);
+    border-radius: 22px;
+    padding: 35px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    font-size: 45px;
+}
+
+.header h1 {
+    font-size: 30px;
+    margin: 8px 0;
+}
+
+.header p {
+    color: #94a3b8;
+}
+
+/* Password input */
+
+.input-title {
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.input-box {
+    display: flex;
+    gap: 10px;
+}
+
+input {
+    flex: 1;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #334155;
+    background: #020617;
+    color: white;
+    font-size: 17px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #3b82f6;
+}
+
+.show-btn {
+    background: #334155;
+    color: white;
+    border: none;
+    padding: 0 18px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Buttons */
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 18px 0 30px;
+}
+
+button {
+    border: none;
+    padding: 13px 20px;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+.analyze {
+    background: #2563eb;
+}
+
+.generate {
+    background: #7c3aed;
+}
+
+.copy {
+    background: #475569;
+}
+
+.clear {
+    background: #dc2626;
+}
+
+/* Main results */
+
+.results {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 18px;
+}
+
+.card {
+    background: #1e293b;
+    border-radius: 15px;
+    padding: 22px;
+}
+
+.card h2 {
+    font-size: 16px;
+    color: #94a3b8;
+    margin-bottom: 15px;
+}
+
+/* Score */
+
+.score {
+    text-align: center;
+}
+
+.score-number {
+    font-size: 42px;
+    font-weight: bold;
+    margin: 15px 0;
+    color: #94a3b8;
+}
+
+.strength {
+    font-size: 22px;
+    font-weight: bold;
+    color: #94a3b8;
+}
+
+/* Progress */
+
+.progress-background {
+    height: 10px;
+    background: #334155;
+    border-radius: 20px;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    width: 0%;
+    border-radius: 20px;
+    transition: 0.5s;
+    background: #22c55e;
+}
+
+/* Requirements */
+
+.requirements div {
+    margin: 9px 0;
+    color: #94a3b8;
+}
+
+.pass {
+    color: #22c55e !important;
+}
+
+.fail {
+    color: #ef4444 !important;
+}
+
+/* Recommendation */
+
+.recommendation {
+    margin-top: 18px;
+}
+
+.recommendation h2 {
+    color: #60a5fa;
+}
+
+.recommendation p {
+    color: #cbd5e1;
+    line-height: 1.7;
+}
+
+ul {
+    margin-left: 20px;
+    margin-top: 8px;
+}
+
+li {
+    margin: 7px 0;
+    color: #cbd5e1;
+}
+
+/* Footer */
+
+.footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* Mobile */
+
+@media(max-width: 700px) {
+
+    .results {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 22px;
+    }
+
+    .header h1 {
+        font-size: 24px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div class="logo">🔐</div>
+
+        <h1>Password Security Analyzer</h1>
+
+        <p>Analyze your password and improve your security</p>
+
+    </div>
+
+
+    <!-- PASSWORD INPUT -->
+
+    <div class="input-title">
+        Create Your Password
+    </div>
+
+    <div class="input-box">
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Enter your password..."
+            oninput="liveCheck()"
+        >
+
+        <button
+            class="show-btn"
+            onclick="togglePassword()"
+            id="showButton"
+        >
+            Show
+        </button>
+
+    </div>
+
+
+    <!-- BUTTONS -->
+
+    <div class="buttons">
+
+        <button
+            class="analyze"
+            onclick="analyzePassword()"
+        >
+            🔍 ANALYZE PASSWORD
+        </button>
+
+        <button
+            class="generate"
+            onclick="generatePassword()"
+        >
+            ⚡ GENERATE STRONG PASSWORD
+        </button>
+
+        <button
+            class="copy"
+            onclick="copyPassword()"
+        >
+            📋 COPY
+        </button>
+
+        <button
+            class="clear"
+            onclick="clearApp()"
+        >
+            CLEAR
+        </button>
+
+    </div>
+
+
+    <!-- RESULTS -->
+
+    <div class="results">
+
+
+        <!-- SCORE -->
+
+        <div class="card score">
+
+            <h2>SECURITY SCORE</h2>
+
+            <div
+                class="score-number"
+                id="score"
+            >
+                0/100
+            </div>
+
+            <div
+                class="strength"
+                id="strength"
+            >
+                NOT CHECKED
+            </div>
+
+            <div class="progress-background">
+
+                <div
+                    class="progress"
+                    id="progress"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- REQUIREMENTS -->
+
+        <div class="card requirements">
+
+            <h2>PASSWORD REQUIREMENTS</h2>
+
+            <div id="length">
+                ○ At least 8 characters
+            </div>
+
+            <div id="long">
+                ○ 12 or more characters
+            </div>
+
+            <div id="lowercase">
+                ○ Lowercase letter
+            </div>
+
+            <div id="uppercase">
+                ○ Uppercase letter
+            </div>
+
+            <div id="number">
+                ○ Number
+            </div>
+
+            <div id="special">
+                ○ Special character
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RECOMMENDATIONS -->
+
+    <div class="card recommendation">
+
+        <h2>💡 SECURITY RECOMMENDATIONS</h2>
+
+        <p id="recommendations">
+
+            Enter a password above to begin the security analysis.
+
+        </p>
+
+    </div>
+
+
+    <div class="footer">
+
+        Cyber Security Mini Project
+        |
+        Password Strength Analyzer
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ==========================================
+   PASSWORD ANALYSIS
+========================================== */
+
+function analyzePassword() {
+
+    const password =
+        document.getElementById("password").value;
+
+    if (password.length === 0) {
+
+        alert("Please enter a password first.");
+
+        return;
+    }
+
+
+    let score = 0;
+
+    let suggestions = [];
+
+
+    /* Length */
+
+    if (password.length >= 12) {
+
+        score += 25;
+
+    }
+
+    else if (password.length >= 8) {
+
+        score += 15;
+
+    }
+
+    else {
+
+        suggestions.push(
+            "Use at least 8 characters."
+        );
+
+    }
+
+
+    /* Lowercase */
+
+    const lowercase =
+        /[a-z]/.test(password);
+
+    if (lowercase) {
+
+        score += 15;
+
+    }
+
+    else {
+
+        suggestions.push(
+            "Add at least one lowercase letter."
+        );
+
+    }
+
+
+    /* Uppercase */
+
+    const uppercase =
+        /[A-Z]/.test(password);
+
+    if (uppercase) {
+
+        score += 15;
+
+    }
+
+    else {
+
+        suggestions.push(
+            "Add at least one uppercase letter."
+        );
+
+    }
+
+
+    /* Number */
+
+    const number =
+        /[0-9]/.test(password);
+
+    if (number) {
+
+        score += 15;
+
+    }
+
+    else {
+
+        suggestions.push(
+            "Add at least one number."
+        );
+
+    }
+
+
+    /* Special character */
+
+    const special =
+        /[^A-Za-z0-9]/.test(password);
+
+    if (special) {
+
+        score += 20;
+
+    }
+
+    else {
+
+        suggestions.push(
+            "Add at least one special character."
+        );
+
+    }
+
+
+    /* Common passwords */
+
+    const commonPasswords = [
+
+        "password",
+        "password123",
+        "123456",
+        "12345678",
+        "qwerty",
+        "admin",
+        "welcome",
+        "abc123"
+
+    ];
+
+
+    if (
+        commonPasswords.includes(
+            password.toLowerCase()
+        )
+    ) {
+
+        score = Math.max(
+            0,
+            score - 30
+        );
+
+        suggestions.push(
+            "Avoid common passwords."
+        );
+
+    }
+
+
+    /* Repeated characters */
+
+    if (
+        /(.)\1\1/.test(password)
+    ) {
+
+        score = Math.max(
+            0,
+            score - 10
+        );
+
+        suggestions.push(
+            "Avoid repeating the same character many times."
+        );
+
+    }
+
+
+    /* Simple sequence */
+
+    const sequences = [
+
+        "123456",
+        "abcdef",
+        "qwerty",
+        "654321"
+
+    ];
+
+
+    for (
+        let sequence of sequences
+    ) {
+
+        if (
+            password
+                .toLowerCase()
+                .includes(sequence)
+        ) {
+
+            score = Math.max(
+                0,
+                score - 10
+            );
+
+            suggestions.push(
+                "Avoid simple number or keyboard sequences."
+            );
+
+            break;
+
+        }
+
+    }
+
+
+    /* Strength */
+
+    let strength;
+
+
+    if (score < 40) {
+
+        strength = "WEAK";
+
+    }
+
+    else if (score < 70) {
+
+        strength = "MEDIUM";
+
+    }
+
+    else {
+
+        strength = "STRONG";
+
+    }
+
+
+    /* Display score */
+
+    document.getElementById("score")
+        .innerText =
+        score + "/100";
+
+
+    document.getElementById("strength")
+        .innerText =
+        strength;
+
+
+    document.getElementById("progress")
+        .style.width =
+        score + "%";
+
+
+    /* Score colors */
+
+    let color;
+
+    if (score < 40) {
+
+        color = "#ef4444";
+
+    }
+
+    else if (score < 70) {
+
+        color = "#f59e0b";
+
+    }
+
+    else {
+
+        color = "#22c55e";
+
+    }
+
+
+    document.getElementById("score")
+        .style.color =
+        color;
+
+
+    document.getElementById("strength")
+        .style.color =
+        color;
+
+
+    document.getElementById("progress")
+        .style.background =
+        color;
+
+
+    /* Requirements */
+
+    updateCheck(
+        "length",
+        password.length >= 8,
+        "At least 8 characters"
+    );
+
+    updateCheck(
+        "long",
+        password.length >= 12,
+        "12 or more characters"
+    );
+
+    updateCheck(
+        "lowercase",
+        lowercase,
+        "Lowercase letter"
+    );
+
+    updateCheck(
+        "uppercase",
+        uppercase,
+        "Uppercase letter"
+    );
+
+    updateCheck(
+        "number",
+        number,
+        "Number"
+    );
+
+    updateCheck(
+        "special",
+        special,
+        "Special character"
+    );
+
+
+    /* Recommendations */
+
+    const recommendation =
+        document.getElementById(
+            "recommendations"
+        );
+
+
+    if (
+        suggestions.length === 0
+    ) {
+
+        recommendation.innerHTML =
+            "<strong>✓ Excellent!</strong><br><br>" +
+            "Your password satisfies the basic security requirements.";
+
+    }
+
+    else {
+
+        recommendation.innerHTML =
+            "<strong>Improve your password:</strong>" +
+            "<ul>" +
+            suggestions
+                .map(
+                    item =>
+                    "<li>" +
+                    item +
+                    "</li>"
+                )
+                .join("") +
+            "</ul>";
+
+    }
+
+}
+
+
+/* ==========================================
+   REQUIREMENT DISPLAY
+========================================== */
+
+function updateCheck(
+    id,
+    passed,
+    text
+) {
+
+    const element =
+        document.getElementById(id);
+
+
+    if (passed) {
+
+        element.innerHTML =
+            "✓ " + text;
+
+        element.className =
+            "pass";
+
+    }
+
+    else {
+
+        element.innerHTML =
+            "✗ " + text;
+
+        element.className =
+            "fail";
+
+    }
+
+}
+
+
+/* ==========================================
+   SHOW / HIDE
+========================================== */
+
+function togglePassword() {
+
+    const password =
+        document.getElementById(
+            "password"
+        );
+
+    const button =
+        document.getElementById(
+            "showButton"
+        );
+
+
+    if (
+        password.type === "password"
+    ) {
+
+        password.type = "text";
+
+        button.innerText =
+            "Hide";
+
+    }
+
+    else {
+
+        password.type = "password";
+
+        button.innerText =
+            "Show";
+
+    }
+
+}
+
+
+/* ==========================================
+   GENERATE PASSWORD
+========================================== */
+
+function generatePassword() {
+
+    const lowercase =
+        "abcdefghijklmnopqrstuvwxyz";
+
+    const uppercase =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    const numbers =
+        "0123456789";
+
+    const special =
+        "!@#$%^&*";
+
+    const all =
+        lowercase +
+        uppercase +
+        numbers +
+        special;
+
+
+    let password = "";
+
+    password += randomChar(lowercase);
+
+    password += randomChar(uppercase);
+
+    password += randomChar(numbers);
+
+    password += randomChar(special);
+
+
+    for (
+        let i = 0;
+        i < 10;
+        i++
+    ) {
+
+        password +=
+            randomChar(all);
+
+    }
+
+
+    /* Shuffle */
+
+    password =
+        password
+            .split("")
+            .sort(
+                () => Math.random() - 0.5
+            )
+            .join("");
+
+
+    document.getElementById(
+        "password"
+    ).value = password;
+
+
+    document.getElementById(
+        "password"
+    ).type = "text";
+
+
+    document.getElementById(
+        "showButton"
+    ).innerText = "Hide";
+
+
+    analyzePassword();
+
+}
+
+
+function randomChar(text) {
+
+    return text[
+        Math.floor(
+            Math.random() *
+            text.length
+        )
+    ];
+
+}
+
+
+/* ==========================================
+   COPY
+========================================== */
+
+function copyPassword() {
+
+    const password =
+        document.getElementById(
+            "password"
+        ).value;
+
+
+    if (!password) {
+
+        alert(
+            "Enter or generate a password first."
+        );
+
+        return;
+
+    }
+
+
+    navigator.clipboard.writeText(
+        password
+    );
+
+
+    alert(
+        "Password copied successfully!"
+    );
+
+}
+
+
+/* ==========================================
+   CLEAR
+========================================== */
+
+function clearApp() {
+
+    document.getElementById(
+        "password"
+    ).value = "";
+
+
+    document.getElementById(
+        "score"
+    ).innerText = "0/100";
+
+
+    document.getElementById(
+        "strength"
+    ).innerText =
+        "NOT CHECKED";
+
+
+    document.getElementById(
+        "score"
+    ).style.color =
+        "#94a3b8";
+
+
+    document.getElementById(
+        "strength"
+    ).style.color =
+        "#94a3b8";
+
+
+    document.getElementById(
+        "progress"
+    ).style.width =
+        "0%";
+
+
+    const items = [
+
+        ["length", "At least 8 characters"],
+        ["long", "12 or more characters"],
+        ["lowercase", "Lowercase letter"],
+        ["uppercase", "Uppercase letter"],
+        ["number", "Number"],
+        ["special", "Special character"]
+
+    ];
+
+
+    items.forEach(
+        item => {
+
+            const element =
+                document.getElementById(
+                    item[0]
+                );
+
+            element.innerHTML =
+                "○ " + item[1];
+
+            element.className = "";
+
+        }
+    );
+
+
+    document.getElementById(
+        "recommendations"
+    ).innerText =
+        "Enter a password above to begin the security analysis.";
+
+}
+
+
+/* ==========================================
+   LIVE CHECK
+========================================== */
+
+function liveCheck() {
+
+    const password =
+        document.getElementById(
+            "password"
+        ).value;
+
+
+    if (password.length > 0) {
+
+        analyzePassword();
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
